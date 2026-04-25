@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SwiftVault | AutoBespoke Luxury</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= 1. ROLLS-ROYCE BESPOKE VARIABLES ================= */
+        :root {
+            --rr-vantablack: #000000;
+            --rr-graphite: #0a0a0a;
+            --rr-pure-silver: #e0e0e0;
+            --rr-muted-silver: #777777;
+            --rr-champagne: #C5A059;
+            --rr-line: #1a1a1a;
+            --rr-danger: #8b0000;
+            --3d-ease: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--rr-vantablack); color: var(--rr-pure-silver); width: 100vw; height: 100dvh; overflow: hidden; }
+
+        /* ================= 2. CINEMATIC SCENE ENGINE ================= */
+        .screen {
+            position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto; overflow-x: hidden; background-color: var(--rr-vantablack);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.6s ease, visibility 0.6s; z-index: 1;
+        }
+        .screen.active { opacity: 1; visibility: visible; pointer-events: auto; z-index: 10; }
+        .screen::-webkit-scrollbar { display: none; }
+        
+        .wrapper { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100%; width: 100%; max-width: 900px; margin: 0 auto; padding: 5vh 5vw 120px 5vw; }
+
+        /* ================= 3. TYPOGRAPHY & BUTTONS (FLUID) ================= */
+        h1 { font-size: clamp(1.3rem, 4vw, 2rem); letter-spacing: clamp(6px, 2vw, 12px); text-transform: uppercase; font-weight: 200; text-align: center; margin-bottom: 10px; color: var(--rr-pure-silver); }
+        .subtitle { font-size: clamp(0.55rem, 2vw, 0.65rem); color: var(--rr-muted-silver); letter-spacing: clamp(3px, 1.5vw, 5px); text-transform: uppercase; text-align: center; font-weight: 300; margin-bottom: clamp(25px, 5vh, 40px); }
+
+        .btn { padding: clamp(14px, 3vw, 16px) clamp(25px, 5vw, 35px); font-weight: 400; text-transform: uppercase; letter-spacing: 2px; font-size: clamp(0.6rem, 2vw, 0.65rem); cursor: pointer; transition: 0.4s ease; background: transparent; border: 1px solid var(--rr-muted-silver); color: var(--rr-pure-silver); border-radius: 2px; text-align: center;}
+        .btn:active { background: var(--rr-pure-silver); color: var(--rr-vantablack); transform: scale(0.97); }
+        .btn-gold { border-color: var(--rr-champagne); color: var(--rr-champagne); }
+        .btn-gold:active { background: var(--rr-champagne); color: var(--rr-vantablack); }
+        .btn-disabled { opacity: 0.2; pointer-events: none; border-color: var(--rr-line); color: var(--rr-muted-silver); }
+        .action-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 30px; }
+
+        /* ================= 4. CLIENT PITCH ================= */
+        #scr-guide { background: rgba(0,0,0,0.96); z-index: 999; }
+        .brief-box { 
+            background: var(--rr-graphite); border: 1px solid var(--rr-line); padding: clamp(30px, 5vw, 40px) clamp(20px, 4vw, 30px); 
+            width: 100%; max-width: 500px; text-align: left; box-shadow: 0 40px 100px rgba(0,0,0,1); border-radius: 4px; 
+            max-height: 85dvh; overflow-y: auto; 
+        }
+        .brief-box::-webkit-scrollbar { width: 0px; }
+        
+        .brief-box h2 { font-size: clamp(0.9rem, 3vw, 1.1rem); letter-spacing: 4px; font-weight: 400; color: var(--rr-champagne); margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid var(--rr-line); padding-bottom: 15px; text-align: center;}
+        .brief-desc { font-size: clamp(0.7rem, 2.5vw, 0.75rem); color: var(--rr-pure-silver); line-height: 1.8; font-weight: 300; margin-bottom: 30px; text-align: center;}
+        
+        .step-list { display: flex; flex-direction: column; gap: clamp(15px, 4vh, 20px); margin-bottom: 40px; }
+        .step-item { display: flex; gap: 15px; align-items: flex-start; }
+        .step-num { color: var(--rr-vantablack); background: var(--rr-champagne); padding: 5px 8px; font-family: monospace; font-size: clamp(0.6rem, 2vw, 0.7rem); border-radius: 2px; font-weight: 600; flex-shrink: 0;}
+        .step-txt h4 { font-size: clamp(0.75rem, 2.5vw, 0.8rem); color: var(--rr-pure-silver); margin-bottom: 5px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase;}
+        .step-txt p { font-size: clamp(0.65rem, 2vw, 0.7rem); color: var(--rr-muted-silver); line-height: 1.5; font-weight: 300; }
+
+        /* ================= 5. REAL 3D BOOK MENU (4 ITEMS FLUID) ================= */
+        .menu-top-tabs { display: flex; gap: 8px; margin-bottom: 25px; justify-content: center; width: 100%; max-width: 380px; flex-wrap: wrap;}
+        .b-tab { background: transparent; border: 1px solid var(--rr-line); color: var(--rr-muted-silver); padding: 12px clamp(10px, 2vw, 20px); font-size: clamp(0.55rem, 2vw, 0.65rem); text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: 0.3s; letter-spacing: 2px; flex: 1; text-align: center; white-space: nowrap;}
+        .b-tab.active { background: var(--rr-champagne); color: #000; border-color: var(--rr-champagne); font-weight: 500;}
+
+        .book-stage { width: 100%; height: clamp(380px, 50vh, 440px); display: flex; justify-content: center; align-items: center; perspective: 2000px;}
+        .book { position: relative; width: 100%; max-width: 380px; height: 100%; transform-style: preserve-3d; }
+        
+        .page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #080808; border: 1px solid var(--rr-line); border-radius: 2px 15px 15px 2px;
+            transform-origin: left center; transition: transform 0.9s var(--3d-ease), box-shadow 0.9s;
+            transform-style: preserve-3d; display: flex; flex-direction: column;
+            box-shadow: inset -10px 0 30px rgba(0,0,0,0.8), 20px 10px 40px rgba(0,0,0,0.9);
+            overflow: hidden; 
+        }
+        .page.flipped { transform: rotateY(-180deg); box-shadow: inset 10px 0 30px rgba(0,0,0,0.8); pointer-events: none; z-index: 0; }
+        .page.active { z-index: 5; }
+
+        .page-header { background: #111; padding: clamp(15px, 3vh, 20px) 15px; text-align: center; border-bottom: 1px solid var(--rr-line); }
+        .p-cat { font-size: clamp(0.65rem, 2.5vw, 0.75rem); color: var(--rr-champagne); letter-spacing: 4px; text-transform: uppercase; font-weight: 400;}
+        .p-num { font-size: clamp(0.5rem, 2vw, 0.55rem); color: var(--rr-muted-silver); font-family: monospace; margin-top: 5px; letter-spacing: 2px; }
+        
+        .page-content { padding: 5px clamp(15px, 4vw, 25px); display: flex; flex-direction: column; flex: 1; justify-content: center; overflow-y: auto;}
+        .page-content::-webkit-scrollbar { display: none; }
+        
+        .m-item { display: flex; justify-content: space-between; align-items: center; padding: clamp(15px, 2.5vh, 20px) 0; border-bottom: 1px solid #151515; cursor: pointer; transition: 0.3s; }
+        .m-item:last-child { border-bottom: none; }
+        .m-item:active { background: rgba(197, 160, 89, 0.05); padding-left: 5px; }
+        .m-info { flex: 1; padding-right: 10px; min-width: 0;}
+        .m-name { font-size: clamp(0.6rem, 2.5vw, 0.7rem); color: var(--rr-pure-silver); margin-bottom: 4px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .m-desc { font-size: clamp(0.5rem, 2vw, 0.55rem); color: var(--rr-muted-silver); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .m-price { font-size: clamp(0.65rem, 2.5vw, 0.75rem); color: var(--rr-champagne); font-family: monospace; flex-shrink: 0;}
+
+        .book-controls { display: flex; justify-content: space-between; width: 100%; max-width: 380px; margin-top: 25px; }
+        .ctrl-btn { background: transparent; border: 1px solid var(--rr-line); color: var(--rr-muted-silver); font-size: clamp(0.55rem, 2vw, 0.6rem); text-transform: uppercase; letter-spacing: 2px; cursor: pointer; padding: 12px 20px; transition: 0.3s; border-radius: 2px;}
+        .ctrl-btn:active { color: var(--rr-vantablack); background: var(--rr-pure-silver); border-color: var(--rr-pure-silver);}
+
+        /* ================= 6. CHECKOUT BAR ================= */
+        .checkout-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.95);
+            backdrop-filter: blur(15px); border-top: 1px solid var(--rr-line); 
+            padding: 15px clamp(15px, 5vw, 30px);
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 500; transform: translateY(100%); transition: transform 0.5s var(--3d-ease);
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+        .checkout-bar.active { transform: translateY(0); }
+        .chk-amt { font-size: clamp(1rem, 4vw, 1.2rem); color: var(--rr-champagne); font-family: monospace; font-weight: 300; letter-spacing: 1px; margin-top: 5px; display: block;}
+
+        /* ================= 7. ROTATING 3D BAY ================= */
+        .stage-3d { width: 100%; height: clamp(220px, 35vh, 280px); display: flex; justify-content: center; align-items: center; perspective: 1200px; margin: 20px 0;}
+        
+        .table-assembly {
+            position: relative; width: clamp(140px, 40vw, 180px); height: clamp(140px, 40vw, 180px); transform-style: preserve-3d;
+            transform: rotateX(55deg) rotateZ(0deg); transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .t-top {
+            position: absolute; inset: 0; border-radius: 50%;
+            background: radial-gradient(circle, #222 0%, #0a0a0a 100%); border: clamp(3px, 1vw, 5px) solid #2a2a2a;
+            transform: translateZ(40px); display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.9);
+            border-bottom: 2px solid var(--rr-champagne);
+        }
+        .t-num { font-size: clamp(2.5rem, 8vw, 4rem); color: var(--rr-champagne); font-family: monospace; font-weight: 300; transition: transform 0.8s; text-shadow: 0 5px 15px #000; letter-spacing: -2px;}
+        .t-base {
+            position: absolute; top: 35%; left: 35%; width: 30%; height: 40px;
+            background: linear-gradient(to right, #000, #333, #000);
+            transform: translateZ(0) rotateX(90deg); transform-origin: top; border-radius: 50%;
+        }
+
+        .nav-table { background: transparent; border: none; color: var(--rr-muted-silver); font-size: clamp(2.5rem, 8vw, 4rem); cursor: pointer; padding: clamp(10px, 3vw, 20px); transition: 0.3s; }
+        .nav-table:active { color: var(--rr-champagne); transform: scale(0.9); }
+
+        /* WAKTU SCROLLER DIPERBAIKI (PREMIUM CHIPS) */
+        .time-scroller {
+            display: flex; overflow-x: auto; gap: 12px; width: 100%; max-width: 450px; 
+            padding: 10px 5px; margin-bottom: 30px; -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .time-scroller::-webkit-scrollbar { display: none; }
+        
+        .time-btn {
+            padding: 12px clamp(15px, 4vw, 25px); 
+            background: #111111; /* Kotak yang jelas */
+            border: 1px solid #333333; /* Border tidak akan numpuk */
+            color: var(--rr-muted-silver); cursor: pointer; border-radius: 4px; 
+            transition: 0.3s; flex-shrink: 0; font-family: monospace; font-size: clamp(0.7rem, 2.5vw, 0.8rem); letter-spacing: 2px;
+        }
+        .time-btn.active { 
+            background: var(--rr-champagne); color: var(--rr-vantablack); 
+            border-color: var(--rr-champagne); font-weight: bold; 
+        }
+        .time-btn.occupied { 
+            opacity: 0.35; pointer-events: none; 
+            background: transparent; color: var(--rr-danger); 
+            text-decoration: line-through; border-color: var(--rr-danger);
+        }
+
+        /* ================= 8. REAL PHYSICAL RECEIPT (ISOLATED SCREEN) ================= */
+        .receipt-wrapper { filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8)); margin: auto; width: 100%; max-width: 350px;}
+        .real-receipt {
+            background: #f9f9f9; color: #111; font-family: 'Space Mono', monospace;
+            width: 100%; padding: clamp(30px, 8vw, 40px) clamp(20px, 5vw, 25px) clamp(50px, 12vw, 60px) clamp(20px, 5vw, 25px); position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), 96% 100%, 92% calc(100% - 10px), 88% 100%, 84% calc(100% - 10px), 80% 100%, 76% calc(100% - 10px), 72% 100%, 68% calc(100% - 10px), 64% 100%, 60% calc(100% - 10px), 56% 100%, 52% calc(100% - 10px), 48% 100%, 44% calc(100% - 10px), 40% 100%, 36% calc(100% - 10px), 32% 100%, 28% calc(100% - 10px), 24% 100%, 20% calc(100% - 10px), 16% 100%, 12% calc(100% - 10px), 8% 100%, 4% calc(100% - 10px), 0 100%);
+            background-image: linear-gradient(to bottom, #fff 0%, #eaeaea 100%);
+        }
+        .rcpt-logo { font-size: clamp(1rem, 4vw, 1.3rem); font-weight: bold; font-family: 'Montserrat', sans-serif; text-transform: uppercase; text-align: center; letter-spacing: 5px; margin-bottom: 5px; }
+        .rcpt-info { font-size: clamp(0.55rem, 2vw, 0.65rem); color: #555; text-align: center; border-bottom: 1px dashed #999; padding-bottom: 15px; margin-bottom: 15px; line-height: 1.4;}
+        .rcpt-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 35vh; overflow-y: auto;}
+        .rcpt-list::-webkit-scrollbar { width: 0; }
+        .rcpt-item { display: flex; justify-content: space-between; font-size: clamp(0.65rem, 2.5vw, 0.75rem); align-items: flex-start; }
+        .rcpt-qty { width: 25px; font-weight: bold; flex-shrink: 0;}
+        .rcpt-name { flex: 1; padding-right: 10px; text-transform: uppercase; line-height: 1.3;}
+        .rcpt-total { display: flex; justify-content: space-between; border-top: 1px dashed #999; padding: 15px 0 0 0; font-weight: bold; font-size: clamp(0.8rem, 3vw, 1rem); margin-top: 10px; }
+        
+        /* ================= 9. AUTH FORM (ISOLATED SCREEN) ================= */
+        .auth-container { width: 100%; max-width: 400px; padding: 40px; background: var(--rr-graphite); border: 1px solid var(--rr-line); border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); margin: auto;}
+        .auth-input { width: 100%; box-sizing: border-box; background: transparent; border: none; border-bottom: 1px solid var(--rr-muted-silver); color: var(--rr-pure-silver); padding: 15px 0; margin-bottom: 25px; font-size: clamp(0.7rem, 2vw, 0.8rem); font-family: 'Montserrat', sans-serif; outline: none; transition: 0.3s; letter-spacing: 1px;}
+        .auth-input:focus { border-bottom-color: var(--rr-champagne); }
+        .auth-input::placeholder { color: #444; }
+
+        /* ================= 10. POS DATABASE ================= */
+        .pos-tabs { display: flex; gap: clamp(10px, 2vw, 20px); justify-content: center; width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--rr-line); padding-bottom: 15px; flex-wrap: wrap;}
+        .pos-section { display: none; width: 100%; flex-direction: column; align-items: center; animation: fadeIn 0.8s ease; }
+        .pos-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--rr-line); background: var(--rr-surface); border-radius: 2px; -webkit-overflow-scrolling: touch;}
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 650px;}
+        th { color: var(--rr-muted-silver); font-size: 0.6rem; text-transform: uppercase; padding: 20px 15px; letter-spacing: 2px; border-bottom: 1px solid var(--rr-line); font-weight: 400; white-space: nowrap;}
+        td { padding: 20px 15px; font-size: 0.7rem; color: var(--rr-pure-silver); border-bottom: 1px solid var(--rr-line); text-transform: uppercase; letter-spacing: 1px; line-height: 1.5;}
+        .action-link { color: var(--rr-champagne); cursor: pointer; transition: 0.3s; font-weight: 500; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap;}
+        
+        .revenue-box { border: 1px solid var(--rr-line); padding: clamp(40px, 8vw, 70px) clamp(20px, 5vw, 40px); text-align: center; width: 100%; max-width: 450px; background: var(--rr-surface); border-radius: 2px;}
+        .rev-title { font-size: clamp(0.6rem, 2vw, 0.7rem); color: var(--rr-muted-silver); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; }
+        .rev-amt { font-size: clamp(1.8rem, 6vw, 3rem); color: var(--rr-champagne); font-family: monospace; font-weight: 300; letter-spacing: 1px;}
+    </style>
+</head>
+<body>
+
+    <div id="scr-guide" class="screen active">
+        <div class="wrapper">
+            <div class="brief-box">
+                <h2>Protokol AutoBespoke</h2>
+                <p class="brief-desc">
+                    Sistem pemesanan bengkel dengan arsitektur UI terpisah yang sangat mulus dan elegan.
+                </p>
+
+                <div class="step-list">
+                    <div class="step-item">
+                        <span class="step-num">1</span>
+                        <div class="step-txt"><h4>Pilih Layanan Mewah</h4><p>Jelajahi paket servis berbentuk buku 3D proporsional.</p></div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-num">2</span>
+                        <div class="step-txt"><h4>Pesan Pitstop (Bay)</h4><p>Putar silinder ruang untuk mengamankan Tempat Kerja dan Jadwal.</p></div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-num">3</span>
+                        <div class="step-txt"><h4>Faktur Terpisah (Clean UI)</h4><p>Layar struk kini berdiri sendiri tanpa gangguan formulir.</p></div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-num">4</span>
+                        <div class="step-txt"><h4>Otorisasi Eksekutif</h4><p>Layar input data dibuat eksklusif sebelum data dikirim ke Kasir.</p></div>
+                    </div>
+                </div>
+                <button class="btn btn-gold" style="width: 100%;" onclick="nav('scr-welcome')">Mulai Simulasi</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-welcome" class="screen">
+        <div class="wrapper">
+            <div style="font-size: clamp(0.55rem, 2vw, 0.65rem); color: var(--rr-champagne); letter-spacing: clamp(10px, 3vw, 15px); margin-bottom: 25px;">EST. 2026</div>
+            <h1>AutoBespoke</h1>
+            <div class="subtitle">Premium Vehicle Care</div>
+            <div class="action-row">
+                <button class="btn" onclick="nav('scr-menu')">Buka Layanan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-menu" class="screen">
+        <div class="wrapper" style="justify-content: flex-start; padding-top: clamp(30px, 8vh, 50px);">
+            <h1>Buku Kurasi</h1>
+            <div class="subtitle">Pilihan Perawatan Eksekutif</div>
+            
+            <div class="menu-top-tabs">
+                <button class="b-tab active" id="tab-mobil" onclick="changeCategory('mobil')">Mobil</button>
+                <button class="b-tab" id="tab-kereta" onclick="changeCategory('kereta')">Kereta</button>
+                <button class="b-tab" id="tab-bundle" onclick="changeCategory('bundle')">Bundling</button>
+            </div>
+            
+            <div class="book-stage">
+                <div class="book" id="book-element"></div>
+            </div>
+
+            <div class="book-controls">
+                <button class="ctrl-btn" onclick="flipBook(-1)">&#10094; Mundur</button>
+                <button class="ctrl-btn" onclick="flipBook(1)">Maju &#10095;</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout-bar" id="checkout-bar">
+        <div>
+            <span style="font-size: clamp(0.5rem, 2vw, 0.6rem); color: var(--rr-muted-silver); letter-spacing: 2px; text-transform: uppercase;">Estimasi Biaya</span>
+            <span class="chk-amt" id="cart-total-price">Rp 0</span>
+        </div>
+        <button class="btn btn-gold" style="padding: clamp(12px, 3vw, 16px) clamp(20px, 5vw, 30px);" onclick="nav('scr-table')">Jadwal (<span id="cart-qty">0</span>)</button>
+    </div>
+
+    <div id="scr-table" class="screen">
+        <div class="wrapper">
+            <h1>Reservasi Pitstop</h1>
+            <div class="subtitle">Pemetaan Silinder Ruang</div>
+
+            <div style="font-size: clamp(0.55rem, 2vw, 0.65rem); color: var(--rr-champagne); letter-spacing: 3px; margin-top: 10px;">1. PILIH TEMPAT (BAY)</div>
+            
+            <div class="stage-3d">
+                <button class="nav-table" onclick="rotateBay(-1)">&#10094;</button>
+                
+                <div class="table-assembly" id="bay-assembly">
+                    <div class="t-base"></div>
+                    <div class="t-top">
+                        <span class="t-num" id="bay-num-display">B1</span>
+                    </div>
+                </div>
+
+                <button class="nav-table" onclick="rotateBay(1)">&#10095;</button>
+            </div>
+
+            <div style="font-size: clamp(0.55rem, 2vw, 0.65rem); color: var(--rr-champagne); letter-spacing: 3px; margin-top: 10px; margin-bottom: 15px;">2. PILIH WAKTU</div>
+            
+            <div class="time-scroller" id="time-scroller"></div>
+            
+            <div style="font-size: clamp(0.65rem, 2.5vw, 0.75rem); letter-spacing: 2px; color: var(--rr-pure-silver); margin-bottom: 40px; margin-top: 10px; font-weight: 300; text-align: center; line-height: 1.4;" id="bay-status-text">MENUNGGU PEMILIHAN ZONA</div>
+
+            <div class="action-row">
+                <button class="btn" onclick="nav('scr-menu')">Kembali</button>
+                <button class="btn btn-gold btn-disabled" id="btn-confirm-bay" onclick="nav('scr-bill')">Terbitkan Struk</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-bill" class="screen">
+        <div class="wrapper">
+            
+            <h1 style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: 30px;">Faktur Anda</h1>
+
+            <div class="receipt-wrapper">
+                <div class="real-receipt">
+                    <div class="rcpt-logo">AutoBespoke</div>
+                    <div class="rcpt-info">
+                        DIGITAL SERVICE RECORD<br>
+                        BAY: <span id="rcpt-bay-num" style="font-weight:bold; color:#000;">--</span> &nbsp;|&nbsp; JAM: <span id="rcpt-time-slot" style="font-weight:bold; color:#000;">--</span>
+                    </div>
+                    
+                    <div class="rcpt-list" id="bill-container"></div>
+                    
+                    <div class="rcpt-total">
+                        <span>ESTIMASI</span>
+                        <span id="bill-final-price">Rp 0</span>
+                    </div>
+                    
+                    <div style="text-align: center; font-size: clamp(0.55rem, 2vw, 0.65rem); color: #777; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ccc; line-height: 1.6;">
+                        Tunjukkan struk digital ini ke kasir<br>saat kedatangan di lokasi.
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button class="btn" onclick="nav('scr-table')">Batal</button>
+                <button class="btn btn-gold" onclick="nav('scr-auth')">Lanjut Verifikasi Identitas</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-auth" class="screen">
+        <div class="wrapper">
+            
+            <h1 style="font-size: clamp(1.2rem, 3vw, 1.5rem); margin-bottom: 10px;">Otorisasi Klien</h1>
+            <div class="subtitle" style="margin-bottom: 40px;">Sistem Keamanan Terminal</div>
+
+            <div class="auth-container">
+                <div style="font-size: clamp(0.55rem, 2vw, 0.65rem); color: var(--rr-champagne); letter-spacing: 3px; margin-bottom: 30px; text-transform: uppercase; text-align: center;">Identitas Kendaraan</div>
+                
+                <input type="text" id="cust-name" class="auth-input" placeholder="Nama Lengkap Pemilik" autocomplete="off">
+                <input type="text" id="cust-plate" class="auth-input" placeholder="Nomor Plat (Cth: BK 1234 XX)" autocomplete="off">
+            </div>
+
+            <div class="action-row" style="margin-top: 40px;">
+                <button class="btn" onclick="nav('scr-bill')">Kembali ke Struk</button>
+                <button class="btn btn-gold" onclick="executeToDatabase()">Eksekusi Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-db" class="screen">
+        <div class="wrapper">
+            <h1 style="font-size: clamp(1.3rem, 4vw, 1.6rem);">Pusat Komando</h1>
+            <div class="subtitle">Sistem Manajemen Bengkel</div>
+            
+            <div class="pos-tabs">
+                <button class="btn active" style="border:none; border-bottom:1px solid transparent; padding:10px;" onclick="switchPosTab('active', this)">Kendaraan Masuk</button>
+                <button class="btn" style="border:none; border-bottom:1px solid transparent; padding:10px;" onclick="switchPosTab('revenue', this)">Laporan Keuangan</button>
+            </div>
+
+            <div id="pos-active" class="pos-section active">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th style="width: 25%;">Identitas & Jadwal</th>
+                                <th style="width: 40%;">Rincian Layanan</th>
+                                <th>Nilai Tagihan</th>
+                                <th>Tindakan</th>
+                            }
+                        </thead>
+                        <tbody id="db-container"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="pos-revenue" class="pos-section" style="justify-content: center; flex: 1; min-height: 30dvh;">
+                <div class="revenue-box">
+                    <div class="rev-title">Total Pendapatan Kotor</div>
+                    <div class="rev-amt" id="total-revenue-display">Rp 0</div>
+                </div>
+            </div>
+            
+            <div class="action-row" style="margin-top: 40px;">
+                <button class="btn" onclick="resetCustomerFlow()">+ Simulasi Klien Baru</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ================= 1. BENGKEL SERVICES DATA ================= */
+        const carServices = ["Nano Ceramic Coating 9H", "Premium Wash & Wax", "Full Interior Detailing", "V8 Engine Bay Cleaning", "Paint Correction (3 Step)", "Glass Coating Treatment", "Headlamp Restoration", "Leather Seat Conditioning", "Odor Removal & Ozone", "Undercarriage Rust Proofing", "PPF (Paint Protection Film)", "Window Tint Installation", "Wheel & Caliper Coating", "Express Polish", "Scratch Removal", "Water Spot Cleaning", "Premium Vinyl Wrap", "Dashboard Restoration", "Carpet Deep Extraction", "AC Evaporator Cleaning", "Complete Sound Deadening", "Plastic Trim Restoration", "Fabric Seat Shampoo", "Exhaust Tip Polishing", "Engine Oil & Filter Change", "Brake Pad Replacement", "Suspension Check & Lube", "Wheel Alignment & Balancing", "Battery Health Check", "Signature Showroom Prep"];
+        const bikeServices = ["Sportbike Premium Wash", "Chain Cleaning & Lube", "Matte Paint Specific Wash", "Helmet Deep Cleaning", "Leather Jacket Conditioning", "Exhaust Pipe Polishing", "Engine Detailing (Kereta)", "Fairing Scratch Polish", "Wheel Rim Coating", "Nano Ceramic for Bikes", "Sprocket Deep Clean", "Brake Caliper Purge", "Radiator Fin Straightening", "Waterless Wipe Down", "Custom Wrap Accent", "Seat Re-upholstery Prep", "Rust Removal (Chrome)", "Suspension Fork Clean", "Battery Trickle Charge", "Full Body Degreasing", "Swingarm Polish", "Visor Anti-Rain Coating", "Grip Replacement Assist", "Chain Tension Adjustment", "Coolant Flush & Replace", "Spark Plug Tuning", "Air Filter Cleaning", "Brake Fluid Bleed", "Signature Track Prep", "Touring Adventure Wash"];
+        const bundleServices = ["Ultimate Car Rebirth", "Kereta Showroom Finish", "Pre-Sale Detail Bundle", "Rainy Season Shield Pack", "Complete V8 Tuning Box", "Touring Ready Kereta Pack", "Interior & Exterior Combo", "The Millionaire Wash", "Track Day Preparation", "Classic Car Restoration", "Sunday Morning Ride Prep", "Midnight Cruiser Polish", "Family SUV Deep Clean", "Off-Road Mud Removal", "Executive Fleet Wash", "Ceramic + PPF Hybrid", "Complete Decontamination", "Luxury Sedan Refresh", "Vintage Bike Rebuild Pack", "Engine + Undercarriage Combo", "Glass + Paint Shield", "Leather + Carpet Rejuvenation", "The Autobahn Package", "Exotic Supercar Detail", "Winter Storage Prep", "Spring Awakening Wash", "Big Bike Touring Detail", "City Commuter Clean", "Night Vision Enhancer", "The AutoBespoke Signature"];
+
+        const generateData = (namesArray, basePrice, prefix) => {
+            return namesArray.map((name, i) => ({
+                id: `${prefix.charAt(0)}${i+1}`, name: name, 
+                desc: `Premium Treatment No. ${i+1}`,
+                price: basePrice + (Math.floor(Math.random() * 10) * 100000)
+            }));
+        };
+        
+        const databaseMenu = { 
+            mobil: generateData(carServices, 800000, 'Mobil'), 
+            kereta: generateData(bikeServices, 250000, 'Kereta'), 
+            bundle: generateData(bundleServices, 2500000, 'Bundle') 
+        };
+
+        /* ================= 2. 3D BOOK ENGINE ================= */
+        const ITEMS_PER_PAGE = 4; 
+        let currentCategory = 'mobil';
+        let currentPage = 1;
+        let totalPages = 0;
+
+        function buildBook(category) {
+            currentCategory = category;
+            const items = databaseMenu[category];
+            totalPages = Math.ceil(items.length / ITEMS_PER_PAGE); 
+            currentPage = 1;
+
+            const bookEl = document.getElementById('book-element');
+            bookEl.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItems = items.slice((i - 1) * ITEMS_PER_PAGE, i * ITEMS_PER_PAGE);
+                let htmlItems = pageItems.map(item => `
+                    <div class="m-item" onclick="addCart('${item.id}', '${item.name}', ${item.price})">
+                        <div class="m-info">
+                            <div class="m-name">${item.name}</div>
+                            <div class="m-desc">${item.desc}</div>
+                        </div>
+                        <div class="m-price">${item.price.toLocaleString('id-ID')}</div>
+                    </div>
+                `).join('');
+
+                bookEl.innerHTML += `
+                    <div class="page ${i === 1 ? 'active' : ''}" id="page-${i}" style="z-index: ${totalPages - i + 1};">
+                        <div class="page-header">
+                            <div class="p-cat">${category === 'mobil' ? 'MOBIL' : category === 'kereta' ? 'KERETA' : 'BUNDLING'}</div>
+                            <div class="p-num">HALAMAN ${i} DARI ${totalPages}</div>
+                        </div>
+                        <div class="page-content">${htmlItems}</div>
+                    </div>
+                `;
+            }
+            updateBookZIndex();
+        }
+
+        function changeCategory(cat) {
+            document.querySelectorAll('.b-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${cat}`).classList.add('active');
+            buildBook(cat);
+        }
+
+        function flipBook(dir) {
+            const oldPage = currentPage;
+            currentPage += dir;
+            if(currentPage < 1) currentPage = 1;
+            if(currentPage > totalPages) currentPage = totalPages;
+            if(oldPage !== currentPage) updateBookZIndex();
+        }
+
+        function updateBookZIndex() {
+            for(let i = 1; i <= totalPages; i++) {
+                const p = document.getElementById(`page-${i}`);
+                p.classList.remove('active', 'flipped');
+                if (i < currentPage) { p.classList.add('flipped'); p.style.zIndex = i; } 
+                else if (i === currentPage) { p.classList.add('active'); p.style.zIndex = totalPages; } 
+                else { p.style.zIndex = totalPages - i; }
+            }
+        }
+
+        /* ================= 3. STATE & NAVIGATION ================= */
+        let cart = [];
+        let currentBayNum = 1;
+        let selectedTime = null;
+        let rotationAngle = 0; 
+        let db = [];
+        let occupiedSlots = new Set(); 
+        let totalRevenue = 0; 
+        
+        const TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
+
+        function nav(screenId) {
+            if (screenId === 'scr-table' && cart.length === 0) { alert("Sistem: Pilih minimal satu layanan."); return; }
+            if (screenId === 'scr-bill') renderBill();
+            if (screenId === 'scr-table') initTimes();
+            
+            const cartBar = document.getElementById('checkout-bar');
+            if(screenId !== 'scr-menu') cartBar.classList.remove('active');
+            else if (cart.length > 0) cartBar.classList.add('active');
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            setTimeout(() => {
+                document.getElementById(screenId).classList.add('active');
+                document.getElementById(screenId).scrollTo(0,0);
+            }, 600); 
+        }
+
+        /* ================= 4. CART ================= */
+        function addCart(id, name, price) {
+            let item = cart.find(x => x.id === id);
+            if(item) item.qty++; else cart.push({id, name, price, qty: 1});
+            
+            const total = cart.reduce((a,b) => a + (b.price * b.qty), 0);
+            const qty = cart.reduce((a,b) => a + b.qty, 0);
+            
+            document.getElementById('cart-total-price').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('cart-qty').innerText = qty;
+            document.getElementById('checkout-bar').classList.add('active');
+        }
+
+        function renderBill() {
+            const cont = document.getElementById('bill-container');
+            cont.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                let sub = item.price * item.qty; total += sub;
+                cont.innerHTML += `<div class="rcpt-item"><span class="rcpt-qty">${item.qty}x</span><span class="rcpt-name">${item.name}</span><span>${sub.toLocaleString('id-ID')}</span></div>`;
+            });
+            
+            document.getElementById('bill-final-price').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('rcpt-bay-num').innerText = currentBayNum.toString().padStart(2,'0');
+            document.getElementById('rcpt-time-slot').innerText = selectedTime;
+        }
+
+        /* ================= 5. ROTATING BAY ================= */
+        function rotateBay(dir) {
+            currentBayNum += dir;
+            if(currentBayNum > 10) currentBayNum = 1;
+            if(currentBayNum < 1) currentBayNum = 10;
+
+            rotationAngle += (dir * -90); 
+            const assembly = document.getElementById('bay-assembly');
+            const numDisplay = document.getElementById('bay-num-display');
+            
+            assembly.style.transform = `rotateX(55deg) rotateZ(${rotationAngle}deg)`;
+            numDisplay.style.transform = `rotateZ(${-rotationAngle}deg)`;
+            numDisplay.innerText = "B" + currentBayNum;
+
+            if(selectedTime && occupiedSlots.has(`Bay${currentBayNum}-${selectedTime}`)) {
+                selectedTime = null; 
+            }
+            initTimes();
+        }
+
+        function initTimes() {
+            const timeScroller = document.getElementById('time-scroller');
+            timeScroller.innerHTML = '';
+            TIMES.forEach(time => {
+                let cls = 'time-btn';
+                if(selectedTime === time) cls += ' active';
+                if(occupiedSlots.has(`Bay${currentBayNum}-${time}`)) cls += ' occupied';
+                timeScroller.innerHTML += `<button class="${cls}" onclick="pickTime('${time}')">${time}</button>`;
+            });
+
+            validateBookingStatus();
+        }
+
+        function pickTime(time) {
+            selectedTime = time;
+            initTimes();
+        }
+
+        function validateBookingStatus() {
+            const statusText = document.getElementById('bay-status-text');
+            const btnConfirm = document.getElementById('btn-confirm-bay');
+
+            if (selectedTime) {
+                statusText.innerText = `BAY ${currentBayNum.toString().padStart(2,'0')} JAM ${selectedTime} DIAMANKAN`;
+                statusText.style.color = "var(--rr-pure-silver)";
+                btnConfirm.classList.remove('btn-disabled');
+            } else {
+                statusText.innerText = "SILAKAN TENTUKAN WAKTU KEDATANGAN";
+                statusText.style.color = "var(--rr-champagne)";
+                btnConfirm.classList.add('btn-disabled');
+            }
+        }
+
+        /* ================= 6. EXECUTE ORDER ================= */
+        function executeToDatabase() {
+            const custName = document.getElementById('cust-name').value.trim();
+            const custPlate = document.getElementById('cust-plate').value.trim().toUpperCase();
+            
+            if(custName === "" || custPlate === "") { 
+                alert("Mohon lengkapi Nama Pemilik dan Plat Kendaraan."); 
+                return; 
+            }
+
+            alert("Simulasi Berhasil: Data pemesanan langsung masuk ke Terminal Kasir.");
+
+            const ref = 'ATB-' + Math.floor(Math.random() * 90000 + 10000);
+            const total = cart.reduce((a,b) => a + (b.price * b.qty), 0);
+            const menuStr = cart.map(x => `<span style="color:#888;">${x.qty}x</span> ${x.name}`).join('<br>');
+            
+            db.push({ id: ref, name: custName, plate: custPlate, bay: currentBayNum, time: selectedTime, detail: menuStr, total: total });
+            occupiedSlots.add(`Bay${currentBayNum}-${selectedTime}`); 
+            
+            renderDB();
+            nav('scr-db');
+        }
+
+        function switchPosTab(tabName, btn) {
+            document.querySelectorAll('.pos-tabs .btn').forEach(b => { b.style.borderColor = 'transparent'; b.style.color = 'var(--rr-muted-silver)'; });
+            btn.style.borderBottom = '1px solid var(--rr-pure-silver)'; btn.style.color = 'var(--rr-pure-silver)';
+
+            document.querySelectorAll('.pos-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('pos-' + tabName).classList.add('active');
+        }
+
+        function renderDB() {
+            const cont = document.getElementById('db-container');
+            cont.innerHTML = '';
+            
+            if(db.length === 0) {
+                cont.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:50px; color:var(--rr-muted-silver);">SISTEM SIAGA. BELUM ADA KENDARAAN MASUK.</td></tr>`;
+            } else {
+                [...db].reverse().forEach((row) => {
+                    cont.innerHTML += `
+                        <tr>
+                            <td style="font-family: monospace; color: var(--rr-muted-silver);">${row.id}</td>
+                            <td style="color:var(--rr-white); font-weight:500; font-size:0.75rem;">
+                                ${row.name.toUpperCase()}<br>
+                                <span style="color:var(--rr-pure-silver); border: 1px solid #444; padding: 2px 5px; border-radius: 2px; margin-top:5px; display:inline-block; font-family:monospace;">${row.plate}</span><br>
+                                <span style="color:var(--rr-champagne); font-size:0.7rem;">BAY ${row.bay.toString().padStart(2,'0')} • ${row.time}</span>
+                            </td>
+                            <td style="line-height:1.6;">${row.detail}</td>
+                            <td style="font-family:monospace; color:var(--rr-champagne);">Rp ${row.total.toLocaleString('id-ID')}</td>
+                            <td><span class="action-link" onclick="clearOrder('${row.id}', ${row.bay}, '${row.time}', ${row.total})">TANDAI SELESAI</span></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function clearOrder(orderId, bayNum, timeSlot, amount) {
+            db = db.filter(x => x.id !== orderId);
+            occupiedSlots.delete(`Bay${bayNum}-${timeSlot}`); 
+            
+            totalRevenue += amount;
+            document.getElementById('total-revenue-display').innerText = `Rp ${totalRevenue.toLocaleString('id-ID')}`;
+            renderDB();
+        }
+
+        function resetCustomerFlow() {
+            cart = []; 
+            document.getElementById('cart-qty').innerText = "0";
+            document.getElementById('cart-total-price').innerText = "Rp 0";
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-plate').value = '';
+            document.getElementById('checkout-bar').classList.remove('active');
+            
+            selectedTime = null;
+
+            changeCategory('mobil');
+            const btnDb = document.querySelectorAll('.pos-tabs .btn')[0];
+            switchPosTab('active', btnDb);
+
+            nav('scr-welcome');
+        }
+
+        // Init
+        buildBook('mobil');
+        initTimes();
+    </script>
+</body>
+</html>
